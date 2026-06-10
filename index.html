@@ -239,56 +239,71 @@ nav {
 
 /* Mobile menu drawer */
 .mobile-nav {
+  display: none;
   position: fixed;
-  top: 84px;
+  top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: var(--olive);
-  border-top: 2px solid var(--border);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-  z-index: 1001;
-  padding: 0;
-  overflow-y: auto;
-  /* Hidden by default via transform — avoids display:none toggle bugs */
-  transform: translateY(-110%);
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
+  z-index: 2000;
   flex-direction: column;
-  /* Only exists at mobile widths */
-  visibility: hidden;
+  overflow: hidden;
 }
 .mobile-nav.open {
-  transform: translateY(0);
-  visibility: visible;
+  display: flex;
 }
-.mobile-nav a {
-  color: var(--olive-hl);
-  text-decoration: none;
-  font-size: 19px;
-  font-weight: 700;
-  padding: 20px clamp(20px, 5vw, 40px);
-  border-bottom: 1px solid var(--border);
+.mobile-nav-header {
+  height: 84px;
+  min-height: 84px;
   display: flex;
   align-items: center;
-  transition: background 0.15s, color 0.15s;
-  min-height: 68px;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 2px solid var(--border);
   flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
 }
-.mobile-nav a:last-child { border-bottom: none; }
-.mobile-nav a:hover, .mobile-nav a.active {
+.mobile-nav-header span {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: var(--olive-hl);
+  font-weight: 600;
+}
+.mobile-nav-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--olive-hl);
+  padding: 8px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+}
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+.mobile-nav-links a {
+  color: var(--olive-hl);
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--border);
+  flex: 1;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+.mobile-nav-links a:last-child { border-bottom: none; }
+.mobile-nav-links a:active,
+.mobile-nav-links a.active {
   background: var(--sage-bg);
   color: var(--sage-dk);
-}
-/* Ensure mobile-nav is hidden entirely on desktop */
-@media (min-width: 641px) {
-  .mobile-nav {
-    display: none !important;
-  }
-  .hamburger {
-    display: none !important;
-  }
 }
 
 /* ================================================================
@@ -1011,20 +1026,13 @@ footer a:hover { text-decoration: underline; }
 }
 
 /* Mobile */
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .nav-links { display: none; }
   .hamburger { display: flex; }
   .dark-toggle-label { display: none; }
-  .reviews-grid { grid-template-columns: 1fr; }
-  .services-grid { grid-template-columns: 1fr; }
-  .gallery-grid { columns: 1; }
-  .quick-form { grid-template-columns: 1fr; }
-  .case-gallery { grid-template-columns: 1fr; height: 180px; }
-  .case-details { grid-template-columns: 1fr; }
-  .process-strip { grid-template-columns: 1fr 1fr; }
-  .social-bar { flex-wrap: wrap; gap: 10px; }
-  .contact-info-card { position: static; }
   .hero-content { max-width: 100%; }
+  .contact-info-card { position: static; }
+  .social-bar { flex-wrap: wrap; gap: 10px; }
 }
 
 /* Very small screens */
@@ -1180,13 +1188,19 @@ footer a:hover { text-decoration: underline; }
 </nav>
 
 <!-- Mobile nav drawer -->
-<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
-  <a href="#" onclick="showPage('home'); closeMobileMenu(); return false;" id="mnav-home" class="active">Home</a>
-  <a href="#" onclick="showPage('services'); closeMobileMenu(); return false;" id="mnav-services">Services</a>
-  <a href="#" onclick="showPage('case-studies'); closeMobileMenu(); return false;" id="mnav-case-studies">Case Studies</a>
-  <a href="#" onclick="showPage('gallery'); closeMobileMenu(); return false;" id="mnav-gallery">Gallery</a>
-  <a href="#" onclick="showPage('contact'); closeMobileMenu(); return false;" id="mnav-contact">Contact Us</a>
-</nav>
+<div class="mobile-nav" id="mobile-nav" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <div class="mobile-nav-header">
+    <span>Gallina Gardens</span>
+    <button class="mobile-nav-close" onclick="closeMobileMenu()" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="mobile-nav-links">
+    <a href="#" onclick="showPage('home'); closeMobileMenu(); return false;" id="mnav-home" class="active">Home</a>
+    <a href="#" onclick="showPage('services'); closeMobileMenu(); return false;" id="mnav-services">Services</a>
+    <a href="#" onclick="showPage('case-studies'); closeMobileMenu(); return false;" id="mnav-case-studies">Case Studies</a>
+    <a href="#" onclick="showPage('gallery'); closeMobileMenu(); return false;" id="mnav-gallery">Gallery</a>
+    <a href="#" onclick="showPage('contact'); closeMobileMenu(); return false;" id="mnav-contact">Contact Us</a>
+  </nav>
+</div>
 
 <main id="main-content">
 <!-- WHATSAPP POPUP -->
@@ -1749,14 +1763,21 @@ function toggleDark(){
    MOBILE NAV
    ================================================================ */
 function toggleMobileMenu(){
-  var nav  = document.getElementById('mobile-nav');
-  var btn  = document.getElementById('hamburger');
+  var nav = document.getElementById('mobile-nav');
+  var btn = document.getElementById('hamburger');
   if(!nav || !btn) return;
-  var open = nav.classList.toggle('open');
-  btn.classList.toggle('open', open);
-  btn.setAttribute('aria-expanded', String(open));
-  // Prevent body scroll when menu is open
-  document.body.style.overflow = open ? 'hidden' : '';
+  var isOpen = nav.classList.contains('open');
+  if(isOpen){
+    nav.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded','false');
+    document.body.style.overflow = '';
+  } else {
+    nav.classList.add('open');
+    btn.classList.add('open');
+    btn.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+  }
 }
 function closeMobileMenu(){
   var nav = document.getElementById('mobile-nav');
@@ -1773,7 +1794,7 @@ function closeMobileMenu(){
    ================================================================ */
 function showPage(name){
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.nav-links a, .mobile-nav a').forEach(function(a){ a.classList.remove('active'); });
+  document.querySelectorAll('.nav-links a, .mobile-nav-links a').forEach(function(a){ a.classList.remove('active'); });
   var pg = document.getElementById('page-'+name);
   if(pg) pg.classList.add('active');
   var nv = document.getElementById('nav-'+name);
