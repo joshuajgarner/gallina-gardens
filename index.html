@@ -180,45 +180,55 @@ nav {
 }
 
 /* Dark mode toggle */
-.dark-toggle {
-  background: rgba(0,0,0,0.08);
-  border: 1px solid rgba(0,0,0,0.18);
-  border-radius: 20px;
-  width: 46px;
-  height: 26px;
-  cursor: pointer;
-  position: relative;
+/* ── Mode toggle widget ── */
+.mode-toggle-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   flex-shrink: 0;
-  transition: background 0.2s;
-  aria-label: "Toggle dark mode";
-}
-.dark-toggle::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  background: var(--sage-dk);
-  border-radius: 50%;
-  transition: transform 0.25s;
-}
-[data-theme="dark"] .dark-toggle {
-  background: var(--sage-dk);
-  border-color: var(--sage);
-}
-[data-theme="dark"] .dark-toggle::after {
-  transform: translateX(20px);
-  background: #fff;
 }
 .dark-toggle-label {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
+  color: #1c2417;
   white-space: nowrap;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
 }
+[data-theme="dark"] .dark-toggle-label {
+  color: #f3eddf;
+}
+.dark-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.dark-toggle:hover {
+  background: rgba(0,0,0,0.07);
+}
+[data-theme="dark"] .dark-toggle:hover {
+  background: rgba(255,255,255,0.08);
+}
+/* Bulb ON — lit (light mode) */
+.bulb-on  { display: block; }
+.bulb-off { display: none;  }
+/* Bulb OFF — unlit (dark mode) */
+[data-theme="dark"] .bulb-on  { display: none;  }
+[data-theme="dark"] .bulb-off { display: block; }
 
 /* Mobile nav hamburger */
 .hamburger {
@@ -1258,8 +1268,31 @@ footer a:hover { text-decoration: underline; }
       <li><a href="#" onclick="showPage('gallery'); return false;" id="nav-gallery">Gallery</a></li>
       <li><a href="#" onclick="showPage('contact'); return false;" id="nav-contact">Contact Us</a></li>
     </ul>
-    <span class="dark-toggle-label" aria-hidden="true">Dark</span>
-    <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" aria-label="Toggle dark mode" aria-pressed="false"></button>
+    <div class="mode-toggle-wrap">
+      <span class="dark-toggle-label" id="dark-toggle-label" aria-hidden="true">Dark</span>
+      <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" aria-label="Toggle dark mode" aria-pressed="false">
+        <!-- Bulb ON: glowing (shown in light mode) -->
+        <svg class="bulb-on" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <!-- glow rays -->
+          <line x1="12" y1="1" x2="12" y2="3.5" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+          <line x1="19.07" y1="4.93" x2="17.36" y2="6.64" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+          <line x1="23" y1="12" x2="20.5" y2="12" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4.93" y1="4.93" x2="6.64" y2="6.64" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+          <line x1="1" y1="12" x2="3.5" y2="12" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+          <!-- bulb body -->
+          <path d="M9 21h6M10 17.5h4" stroke="#b8860b" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M12 4a6 6 0 0 1 6 6c0 2.4-1.4 4.5-3.5 5.5v1h-5v-1C7.4 14.5 6 12.4 6 10a6 6 0 0 1 6-6z" fill="#fbbf24" stroke="#b8860b" stroke-width="1.5"/>
+          <!-- filament -->
+          <path d="M10.5 10.5 Q12 9 13.5 10.5" stroke="#b8860b" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <!-- Bulb OFF: unlit (shown in dark mode) -->
+        <svg class="bulb-off" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 21h6M10 17.5h4" stroke="#6b7a5c" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M12 4a6 6 0 0 1 6 6c0 2.4-1.4 4.5-3.5 5.5v1h-5v-1C7.4 14.5 6 12.4 6 10a6 6 0 0 1 6-6z" fill="none" stroke="#6b7a5c" stroke-width="1.5"/>
+          <path d="M10.5 10.5 Q12 9 13.5 10.5" stroke="#6b7a5c" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
     <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" onclick="toggleMobileMenu()">
       <span></span><span></span><span></span>
     </button>
@@ -1831,20 +1864,23 @@ window.addEventListener('load', function(){
 /* ================================================================
    DARK MODE — toggle function (initial state set in <head>)
    ================================================================ */
+function _syncToggle(isDark){
+  var btn   = document.getElementById('dark-toggle');
+  var label = document.getElementById('dark-toggle-label');
+  if(btn)   btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+  if(label) label.textContent = isDark ? 'Light' : 'Dark';
+}
 function toggleDark(){
   var current = document.documentElement.getAttribute('data-theme');
   var next = (current === 'dark') ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   try { localStorage.setItem('gg-theme', next); } catch(e){}
-  var btn = document.getElementById('dark-toggle');
-  if(btn) btn.setAttribute('aria-pressed', next === 'dark' ? 'true' : 'false');
+  _syncToggle(next === 'dark');
 }
-/* Sync toggle button state on page ready */
+/* Sync toggle state on page ready */
 (function(){
-  var btn = document.getElementById('dark-toggle');
-  if(!btn) return;
   var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+  _syncToggle(isDark);
 })();
 
 /* ================================================================
