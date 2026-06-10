@@ -62,7 +62,11 @@
    ================================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden; /* prevent horizontal scroll on mobile */
+}
 
 body {
   font-family: 'Lato', sans-serif;
@@ -71,6 +75,8 @@ body {
   color: var(--text);
   background: var(--bg);
   transition: background 0.25s, color 0.25s;
+  overflow-x: hidden;
+  max-width: 100vw;
   /* Safe area for notched phones */
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
@@ -238,17 +244,43 @@ nav {
 .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* Mobile menu drawer */
+/* Mobile nav backdrop */
+.mobile-nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1999;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.mobile-nav-backdrop.open { display: block; }
+
+/* Mobile nav drawer — glass panel */
 .mobile-nav {
   display: none;
   position: fixed;
   top: 0;
-  left: 0;
-  width: 100%;
+  right: 0;
+  left: auto;
+  width: 50%;
+  min-width: 220px;
   height: 100%;
-  background: var(--olive);
+  /* Glass effect */
+  background: rgba(243, 237, 224, 0.88);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-left: 1px solid rgba(149,161,132,0.4);
+  box-shadow: -4px 0 32px rgba(0,0,0,0.22);
   z-index: 2000;
   flex-direction: column;
   overflow: hidden;
+}
+[data-theme="dark"] .mobile-nav {
+  background: rgba(28, 36, 24, 0.92);
+  border-left: 1px solid rgba(58, 72, 53, 0.5);
+  border-right: none;
+  box-shadow: -4px 0 32px rgba(0,0,0,0.45);
 }
 .mobile-nav.open {
   display: flex;
@@ -260,12 +292,12 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid rgba(149,161,132,0.3);
   flex-shrink: 0;
 }
 .mobile-nav-header span {
   font-family: 'Playfair Display', serif;
-  font-size: 18px;
+  font-size: 17px;
   color: var(--olive-hl);
   font-weight: 600;
 }
@@ -273,13 +305,20 @@ nav {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 32px;
+  font-size: 28px;
   line-height: 1;
   color: var(--olive-hl);
   padding: 8px;
   font-family: 'Lato', sans-serif;
   font-weight: 300;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
 }
+.mobile-nav-close:hover { background: rgba(149,161,132,0.15); }
 .mobile-nav-links {
   display: flex;
   flex-direction: column;
@@ -289,12 +328,12 @@ nav {
 .mobile-nav-links a {
   color: var(--olive-hl);
   text-decoration: none;
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 700;
   display: flex;
   align-items: center;
-  padding: 0 32px;
-  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  border-bottom: 1px solid rgba(149,161,132,0.25);
   flex: 1;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.12s;
@@ -302,7 +341,7 @@ nav {
 .mobile-nav-links a:last-child { border-bottom: none; }
 .mobile-nav-links a:active,
 .mobile-nav-links a.active {
-  background: var(--sage-bg);
+  background: rgba(149,161,132,0.2);
   color: var(--sage-dk);
 }
 
@@ -323,7 +362,7 @@ nav {
 .section-alt { background: var(--bg-alt); }
 .section-alt .section { padding: clamp(48px, 7vw, 80px) clamp(16px, 5vw, 48px); }
 .section-sage { background: var(--sage); }
-.section-dark { background: #111714; }
+.section-dark { background: #111714; width: 100%; overflow-x: hidden; }
 [data-theme="dark"] .section-dark { background: #0a0f09; }
 
 /* ================================================================
@@ -461,12 +500,14 @@ nav {
    ================================================================ */
 .social-bar {
   background: var(--sage);
-  padding: 10px clamp(16px, 5vw, 48px);
+  padding: 10px clamp(16px, 4vw, 48px);
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
+  box-sizing: border-box;
+  width: 100%;
 }
 .social-bar-label {
   font-size: 11px;
@@ -516,7 +557,9 @@ nav {
    ================================================================ */
 .quick-form-wrap {
   background: var(--sage);
-  padding: clamp(32px, 5vw, 48px) clamp(16px, 5vw, 48px);
+  padding: clamp(32px, 5vw, 48px) clamp(16px, 4vw, 48px);
+  box-sizing: border-box;
+  width: 100%;
 }
 .quick-form-inner { max-width: 1120px; margin: 0 auto; }
 .quick-form-inner h2 {
@@ -833,6 +876,8 @@ nav {
   background: var(--sage);
   padding: clamp(44px, 6vw, 64px) clamp(16px, 5vw, 48px);
   text-align: center;
+  box-sizing: border-box;
+  width: 100%;
 }
 .page-hero h1 {
   color: #fff;
@@ -881,11 +926,28 @@ nav {
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
+.form-group-dark input::placeholder,
+.form-group-dark textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+[data-theme="dark"] .form-group-dark input::placeholder,
+[data-theme="dark"] .form-group-dark textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+[data-theme="dark"] .form-group-dark select {
+  color-scheme: dark;
+}
 .form-group-dark input:focus,
 .form-group-dark select:focus,
 .form-group-dark textarea:focus {
   border-color: var(--sage);
   box-shadow: var(--focus-ring);
+}
+/* In dark mode, label text on contact form */
+[data-theme="dark"] .form-group-dark label {
+  color: var(--text-muted);
 }
 .form-group-dark textarea { min-height: 130px; resize: vertical; }
 
@@ -1023,6 +1085,7 @@ footer a:hover { text-decoration: underline; }
   .contact-layout { grid-template-columns: 1fr; }
   .contact-form-full { grid-template-columns: 1fr; }
   .process-strip { grid-template-columns: 1fr 1fr; }
+  .section { padding: clamp(36px, 6vw, 72px) clamp(16px, 5vw, 48px); }
 }
 
 /* Mobile */
@@ -1032,7 +1095,23 @@ footer a:hover { text-decoration: underline; }
   .dark-toggle-label { display: none; }
   .hero-content { max-width: 100%; }
   .contact-info-card { position: static; }
-  .social-bar { flex-wrap: wrap; gap: 10px; }
+  .social-bar { flex-wrap: wrap; gap: 8px; }
+  .quick-form { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .section { padding: 32px 16px; }
+  .section-alt .section { padding: 32px 16px; }
+  .quick-form-wrap { padding: 28px 16px; }
+  .page-hero { padding: 36px 16px; }
+  .social-bar { padding: 10px 16px; }
+  .reviews-grid { grid-template-columns: 1fr; }
+  .services-grid { grid-template-columns: 1fr; }
+  .process-strip { grid-template-columns: 1fr; }
+  .case-gallery { height: 160px; }
+  .case-body { padding: 20px 16px; }
+  nav { padding: 0 16px; }
+  .hero-content { padding: 32px 16px; }
 }
 
 /* Very small screens */
@@ -1187,7 +1266,8 @@ footer a:hover { text-decoration: underline; }
   </div>
 </nav>
 
-<!-- Mobile nav drawer -->
+<!-- Mobile nav backdrop & drawer -->
+<div class="mobile-nav-backdrop" id="mobile-nav-backdrop" onclick="closeMobileMenu()"></div>
 <div class="mobile-nav" id="mobile-nav" role="dialog" aria-modal="true" aria-label="Navigation menu">
   <div class="mobile-nav-header">
     <span>Gallina Gardens</span>
@@ -1336,6 +1416,14 @@ footer a:hover { text-decoration: underline; }
         <p style="color:var(--text-muted);margin-bottom:20px;font-size:clamp(14px,1.6vw,17px);">Based in Falmouth, Leo covers Falmouth, Penryn, and all surrounding areas within 10km. The map below shows the full coverage zone. Not sure if you're included? Give Leo a call.</p>
         <div class="map-wrap">
           <div id="service-map" role="img" aria-label="Map showing service area within 10km of Falmouth, Cornwall"></div>
+        </div>
+        <!-- Travel note -->
+        <div style="margin-top:18px;background:var(--bg-alt);border-left:3px solid var(--sage);border-radius:0 8px 8px 0;padding:16px 20px;">
+          <p style="font-size:clamp(14px,1.5vw,16px);color:var(--text-muted);line-height:1.6;margin:0;">
+            <strong style="color:var(--text);display:block;margin-bottom:4px;">Outside the 10km zone?</strong>
+            No problem — if the job is big enough, Leo is happy to travel further afield. Get in touch and he will let you know.
+          </p>
+          <button onclick="showPage('contact')" class="btn btn-primary" style="margin-top:12px;font-size:14px;padding:10px 20px;">Enquire Now</button>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:24px;">
@@ -1636,9 +1724,9 @@ footer a:hover { text-decoration: underline; }
           </div>
           <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);">
             <p style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;">Follow Leo</p>
-            <div style="display:flex;gap:14px;">
-              <a href="#" style="color:var(--olive-hl);text-decoration:none;font-size:14px;font-weight:700;">Facebook</a>
-              <a href="#" style="color:var(--olive-hl);text-decoration:none;font-size:14px;font-weight:700;">Instagram</a>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;">
+              <a href="#" style="color:var(--sage-lt);text-decoration:none;font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:3px;">Facebook</a>
+              <a href="https://www.instagram.com/gallina.gardens" target="_blank" rel="noopener noreferrer" style="color:var(--sage-lt);text-decoration:none;font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:3px;">Instagram</a>
             </div>
           </div>
         </div>
@@ -1764,16 +1852,19 @@ function toggleDark(){
    ================================================================ */
 function toggleMobileMenu(){
   var nav = document.getElementById('mobile-nav');
+  var backdrop = document.getElementById('mobile-nav-backdrop');
   var btn = document.getElementById('hamburger');
   if(!nav || !btn) return;
   var isOpen = nav.classList.contains('open');
   if(isOpen){
     nav.classList.remove('open');
+    if(backdrop) backdrop.classList.remove('open');
     btn.classList.remove('open');
     btn.setAttribute('aria-expanded','false');
     document.body.style.overflow = '';
   } else {
     nav.classList.add('open');
+    if(backdrop) backdrop.classList.add('open');
     btn.classList.add('open');
     btn.setAttribute('aria-expanded','true');
     document.body.style.overflow = 'hidden';
@@ -1781,9 +1872,11 @@ function toggleMobileMenu(){
 }
 function closeMobileMenu(){
   var nav = document.getElementById('mobile-nav');
+  var backdrop = document.getElementById('mobile-nav-backdrop');
   var btn = document.getElementById('hamburger');
   if(!nav || !btn) return;
   nav.classList.remove('open');
+  if(backdrop) backdrop.classList.remove('open');
   btn.classList.remove('open');
   btn.setAttribute('aria-expanded','false');
   document.body.style.overflow = '';
