@@ -1232,7 +1232,7 @@ footer a:hover { text-decoration: underline; }
 <!-- Leaflet CSS for interactive service area map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <!-- reCAPTCHA v3 — replace YOUR_RECAPTCHA_SITE_KEY with your actual key -->
-<script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY" async defer></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR" async defer></script>
 
 <!-- Dark mode: apply BEFORE first paint to prevent flash -->
 <script>
@@ -2007,7 +2007,7 @@ function submitQuickForm(){
     formData.append('_subject','Quick Quote Request — Gallina Gardens');
     if(token) formData.append('g-recaptcha-response', token);
 
-    fetch('https://formspree.io/f/YOUR_FORMSPREE_FORM_ID', {
+    fetch('https://formspree.io/f/xnjyzwzw', {
       method: 'POST',
       body: formData,
       headers: { 'Accept': 'application/json' }
@@ -2029,9 +2029,9 @@ function submitQuickForm(){
     });
   }
 
-  if(typeof grecaptcha !== 'undefined' && 'YOUR_RECAPTCHA_SITE_KEY' !== 'YOUR_RECAPTCHA_SITE_KEY'){
+  if(typeof grecaptcha !== 'undefined' && '6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR' !== '6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR'){
     grecaptcha.ready(function(){
-      grecaptcha.execute('YOUR_RECAPTCHA_SITE_KEY', {action:'quick_quote'})
+      grecaptcha.execute('6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR', {action:'quick_quote'})
         .then(function(token){ doSubmit(token); });
     });
   } else {
@@ -2075,7 +2075,7 @@ function submitContactForm(e){
     formData.append('message',  msg      || 'No message provided');
     if(token) formData.append('g-recaptcha-response', token);
 
-    fetch('https://formspree.io/f/YOUR_FORMSPREE_FORM_ID', {
+    fetch('https://formspree.io/f/xnjyzwzw', {
       method: 'POST',
       body: formData,
       headers: { 'Accept': 'application/json' }
@@ -2098,9 +2098,9 @@ function submitContactForm(e){
   }
 
   /* Run reCAPTCHA if loaded, otherwise submit directly */
-  if(typeof grecaptcha !== 'undefined' && 'YOUR_RECAPTCHA_SITE_KEY' !== 'YOUR_RECAPTCHA_SITE_KEY'){
+  if(typeof grecaptcha !== 'undefined' && '6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR' !== '6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR'){
     grecaptcha.ready(function(){
-      grecaptcha.execute('YOUR_RECAPTCHA_SITE_KEY', {action:'contact'})
+      grecaptcha.execute('6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR', {action:'contact'})
         .then(function(token){ doSubmit(token); });
     });
   } else {
