@@ -1231,6 +1231,9 @@ footer a:hover { text-decoration: underline; }
 
 <!-- Leaflet CSS for interactive service area map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- reCAPTCHA v3 — replace YOUR_RECAPTCHA_SITE_KEY with your actual key -->
+<script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY" async defer></script>
+
 <!-- Dark mode: apply BEFORE first paint to prevent flash -->
 <script>
 (function(){
@@ -1399,7 +1402,7 @@ footer a:hover { text-decoration: underline; }
           </select>
         </div>
         <div>
-          <button class="btn btn-dark" style="width:100%;" onclick="submitQuickForm()">Send Enquiry</button>
+          <button id="quick-submit-btn" class="btn btn-dark" style="width:100%;" onclick="submitQuickForm()">Send Enquiry</button>
         </div>
       </div>
       <div class="success-msg" id="home-success" role="status">Thank you — Leo will be in touch very soon.</div>
@@ -1731,7 +1734,7 @@ footer a:hover { text-decoration: underline; }
             <textarea id="cf-message" name="message" placeholder="Please describe your garden and what you'd like help with. The more detail, the better Leo can prepare for your visit."></textarea>
           </div>
           <div class="full-width">
-            <button type="submit" class="btn btn-primary" style="font-size:17px;width:100%;">Send My Enquiry to Leo</button>
+            <button id="contact-submit-btn" type="submit" class="btn btn-primary" style="font-size:17px;width:100%;">Send My Enquiry to Leo</button>
           </div>
         </form>
         <div class="success-msg" id="contact-success" role="status">Thank you — Leo will be in touch within 24 hours.</div>
@@ -1984,48 +1987,125 @@ document.addEventListener('keydown', function(e){
    mailto: fallback — opens mail client pre-filled with form data
    ================================================================ */
 function submitQuickForm(){
-  var name  = document.getElementById('hf-name').value.trim();
-  var phone = document.getElementById('hf-phone').value.trim();
+  var name    = document.getElementById('hf-name').value.trim();
+  var phone   = document.getElementById('hf-phone').value.trim();
   var service = document.getElementById('hf-service').value;
+
   if(!name || !phone){
     alert('Please enter your name and phone number so Leo can get back to you.');
     return;
   }
-  var body = encodeURIComponent('Name: '+name+'\nPhone: '+phone+'\nService: '+(service||'Not specified')+'\n\n');
-  window.location.href = 'mailto:leo@gallina.me.uk?subject=Quick+Quote+Request&body='+body;
-  document.getElementById('home-form').style.display = 'none';
-  document.getElementById('home-success').style.display = 'block';
+
+  var submitBtn = document.getElementById('quick-submit-btn');
+  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
+
+  function doSubmit(token){
+    var formData = new FormData();
+    formData.append('name',    name);
+    formData.append('phone',   phone);
+    formData.append('service', service || 'Not specified');
+    formData.append('_subject','Quick Quote Request — Gallina Gardens');
+    if(token) formData.append('g-recaptcha-response', token);
+
+    fetch('https://formspree.io/f/YOUR_FORMSPREE_FORM_ID', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.ok || data.next){
+        document.getElementById('home-form').style.display = 'none';
+        var ok = document.getElementById('home-success');
+        if(ok){ ok.style.display = 'block'; }
+      } else {
+        alert('Something went wrong. Please try again or call Leo on +44 7342 004 281.');
+        if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Send Enquiry'; }
+      }
+    })
+    .catch(function(){
+      alert('Could not send your message. Please check your connection or call Leo on +44 7342 004 281.');
+      if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Send Enquiry'; }
+    });
+  }
+
+  if(typeof grecaptcha !== 'undefined' && 'YOUR_RECAPTCHA_SITE_KEY' !== 'YOUR_RECAPTCHA_SITE_KEY'){
+    grecaptcha.ready(function(){
+      grecaptcha.execute('YOUR_RECAPTCHA_SITE_KEY', {action:'quick_quote'})
+        .then(function(token){ doSubmit(token); });
+    });
+  } else {
+    doSubmit(null);
+  }
 }
 
 function submitContactForm(e){
   if(e) e.preventDefault();
-  var name    = document.getElementById('cf-name').value.trim();
-  var email   = document.getElementById('cf-email').value.trim();
-  var phone   = document.getElementById('cf-phone').value.trim();
-  var address = document.getElementById('cf-address').value.trim();
-  var timeline= document.getElementById('cf-timeline').value;
-  var service = document.getElementById('cf-service').value;
-  var msg     = document.getElementById('cf-message').value.trim();
 
-  if(!name||!email||!phone||!address){
-    alert('Please fill in your name, email, phone number, and address.');
+  var name     = document.getElementById('cf-name').value.trim();
+  var email    = document.getElementById('cf-email').value.trim();
+  var phone    = document.getElementById('cf-phone').value.trim();
+  var address  = document.getElementById('cf-address').value.trim();
+  var timeline = document.getElementById('cf-timeline').value;
+  var service  = document.getElementById('cf-service').value;
+  var msg      = document.getElementById('cf-message').value.trim();
+
+  /* Basic validation */
+  if(!name || !email || !phone || !address){
+    alert('Please fill in your name, email, phone number and address.');
+    return;
+  }
+  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!emailOk){
+    alert('Please enter a valid email address.');
     return;
   }
 
-  var body = 'Name: '+name
-    +'\nEmail: '+email
-    +'\nPhone: '+phone
-    +'\nAddress: '+address
-    +'\nTimeline: '+(timeline||'Not specified')
-    +'\nService: '+(service||'Not specified')
-    +'\n\nMessage:\n'+msg;
+  var submitBtn = document.getElementById('contact-submit-btn');
+  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
 
-  window.location.href = 'mailto:leo@gallina.me.uk'
-    +'?subject=Garden+Enquiry+from+'+encodeURIComponent(name)
-    +'&body='+encodeURIComponent(body);
+  function doSubmit(token){
+    var formData = new FormData();
+    formData.append('name',     name);
+    formData.append('email',    email);
+    formData.append('phone',    phone);
+    formData.append('address',  address);
+    formData.append('timeline', timeline || 'Not specified');
+    formData.append('service',  service  || 'Not specified');
+    formData.append('message',  msg      || 'No message provided');
+    if(token) formData.append('g-recaptcha-response', token);
 
-  document.getElementById('contact-form').style.display = 'none';
-  document.getElementById('contact-success').style.display = 'block';
+    fetch('https://formspree.io/f/YOUR_FORMSPREE_FORM_ID', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.ok || data.next){
+        document.getElementById('contact-form').style.display = 'none';
+        var ok = document.getElementById('contact-success');
+        if(ok){ ok.style.display = 'block'; }
+      } else {
+        alert('Something went wrong. Please try again or call Leo directly on +44 7342 004 281.');
+        if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Send My Enquiry to Leo'; }
+      }
+    })
+    .catch(function(){
+      alert('Could not send your message. Please check your connection or call Leo on +44 7342 004 281.');
+      if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Send My Enquiry to Leo'; }
+    });
+  }
+
+  /* Run reCAPTCHA if loaded, otherwise submit directly */
+  if(typeof grecaptcha !== 'undefined' && 'YOUR_RECAPTCHA_SITE_KEY' !== 'YOUR_RECAPTCHA_SITE_KEY'){
+    grecaptcha.ready(function(){
+      grecaptcha.execute('YOUR_RECAPTCHA_SITE_KEY', {action:'contact'})
+        .then(function(token){ doSubmit(token); });
+    });
+  } else {
+    doSubmit(null);
+  }
 }
 
 /* ================================================================
