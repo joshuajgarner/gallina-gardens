@@ -2029,7 +2029,7 @@ function submitQuickForm(){
     });
   }
 
-  if(typeof grecaptcha !== 'undefined' && '6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR' !== '6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR'){
+  if(typeof grecaptcha !== 'undefined'){
     grecaptcha.ready(function(){
       grecaptcha.execute('6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR', {action:'quick_quote'})
         .then(function(token){ doSubmit(token); });
@@ -2098,7 +2098,7 @@ function submitContactForm(e){
   }
 
   /* Run reCAPTCHA if loaded, otherwise submit directly */
-  if(typeof grecaptcha !== 'undefined' && '6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR' !== '6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR'){
+  if(typeof grecaptcha !== 'undefined'){
     grecaptcha.ready(function(){
       grecaptcha.execute('6LdimhctAAAAAGvYUhfCPcK2__--y-ExFxuKnMRR', {action:'contact'})
         .then(function(token){ doSubmit(token); });
